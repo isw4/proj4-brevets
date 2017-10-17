@@ -63,10 +63,14 @@ def _calc_times():
     start_time = request.args.get('start_time', '2017-01-01T00:00:00-00:00', type=str)
     app.logger.debug("start time: {}".format(start_time))
 
-    open_time  = acp_times.open_time( km, brev_dist, start_time)
-    close_time = acp_times.close_time(km, brev_dist, start_time)
-    result = {"open": open_time, "close": close_time}
-    return flask.jsonify(result=result)
+    try:
+        open_time  = acp_times.open_time( km, brev_dist, start_time)
+        close_time = acp_times.close_time(km, brev_dist, start_time)
+        result = {"open": open_time, "close": close_time}
+        return flask.jsonify(result=result)
+    except ValueError as e:
+        result = {"exception": str(e)}
+        return flask.jsonify(result=result)
 
 
 #############

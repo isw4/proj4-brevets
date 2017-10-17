@@ -15,9 +15,9 @@ import arrow, math
 #  javadoc comments.
 #
 
-CUTOFF =  [0, 200, 400, 600, 1000]   #cutoff distance brackets for each speed bracket (km)
-MAXSPD =  [0, 34 , 32 , 30 , 28]     #maximum speed for each time bracket (km/h)
-MINSPD =  [0, 15 , 15 , 15 , 11.428] #minimum speed for eachg time bracket (km/h)
+CUTOFF =  [0, 200, 400, 600, 1000, 1300]     #cutoff distance brackets for each speed bracket (km)
+MAXSPD =  [0, 34 , 32 , 30 , 28, 26]         #maximum speed for each time bracket (km/h)
+MINSPD =  [0, 15 , 15 , 15 , 11.428, 13.333] #minimum speed for eachg time bracket (km/h)
 
 
 def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
@@ -62,8 +62,8 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
        This will be in the same time zone as the brevet start time.
     """
     assert brevet_dist_km >= 0 and brevet_dist_km <= 1000
-    if control_dist_km > brevet_dist_km: raise ValueError("Provided control distance is greater than provided Brevet distance")
-    if control_dist_km < 0:              raise ValueError("Provided control distance is less than 0")
+    if control_dist_km > brevet_dist_km*1.1: raise ValueError("The provided control distance is greater than 110% of provided Brevet distance")
+    if control_dist_km < 0:                  raise ValueError("The provided control distance is less than 0")
 
     if control_dist_km == 0: time = 1
     else:                    time = find_time_using(MINSPD, control_dist_km)

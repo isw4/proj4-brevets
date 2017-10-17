@@ -22,40 +22,72 @@ function calc_times(control) {
   $.getJSON(TIME_CALC_URL, { km: km, brev_dist: brev_dist, start_time: start_time }, 
     // response handler
     function(data) {
-      var times = data.result;
-      console.log("Got a response");
-      console.log("Response.open = "  + times.open);
-      console.log("Response.close = " + times.close);
-      open_time_field.val( moment(times.open).format("ddd M/D/Y H:mm"));
-      close_time_field.val( moment(times.close).format("ddd M/D/Y H:mm"));
+      if (data.result.exception) {
+        error_string = data.result.exception;
+        $("#flash").text(error_string);
+        console.log("Exception from server: " + error_string);
+      }
+      else {
+        var times = data.result;
+        console.log("Got a response");
+        console.log("Response.open = "  + times.open);
+        console.log("Response.close = " + times.close);
+        open_time_field.val( moment(times.open).format("ddd M/D/Y H:mm"));
+        close_time_field.val( moment(times.close).format("ddd M/D/Y H:mm"));
+      }
     } // end of handler function
   );// End of getJSON
+}
+
+function first_controle_not_zero() {
+  return !(   parseFloat($("tr.control td:nth-of-type(1)>input").val()) === 0
+           || parseFloat($("tr.control td:nth-of-type(2)>input").val()) === 0);
 }
 
 $(document).ready(function(){
 // Do the following when the page is finished loading
 
   $('input[name="miles"]').change(function() {
+    var control_entry = $(this).parents(".control")
+
+    //clearing all old flash messages
+    $('#flash').text("");
+    control_entry.find("input[name='open']").val("");
+    control_entry.find("input[name='close']").val("");
+
     // If the input is in miles, converts to km first
     var miles = parseFloat($(this).val());
     var km = (1.609344 * miles).toFixed(1) ;
     console.log("Converted " + miles + " miles to " + km + " kilometers");
-    var control_entry = $(this).parents(".control")
     var target = control_entry.find("input[name='km']");
     target.val( km );
+
+    
+
+    if (first_controle_not_zero()) return $("#flash").text("First controle distance must be 0");
 
     // Then calculate times for this entry
     calc_times(control_entry);
   });
 
   $('input[name="km"]').change(function() {
+    var control_entry = $(this).parents(".control")
+
+    //clearing all old flash messages
+    $('#flash').text("");
+    control_entry.find("input[name='open']").val("");
+    control_entry.find("input[name='close']").val("");
+
     // If the input is in km, convert to miles first
     var km = parseFloat($(this).val());
     var miles = (0.621371 * km).toFixed(1) ;
     console.log("Converted " + km + " km to " + miles + " miles");
-    var control_entry = $(this).parents(".control")
     var target = control_entry.find("input[name='miles']");
     target.val( miles );
+
+    
+
+    if (first_controle_not_zero()) return $("#flash").text("First controle distance must be 0");
 
     // Then calculate times for this entry
     calc_times(control_entry);

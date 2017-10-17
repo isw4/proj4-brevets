@@ -1,5 +1,9 @@
+"""
+Test suite for the acp_times 
+"""
+
+import acp_times, arrow
 from acp_times import convert_hrs_mins, find_time_using, open_time, close_time
-import arrow
 
 # Testing convert_hrs_mins
 def test_convert_00_00():
@@ -71,10 +75,10 @@ def test_open_0():
 	assert here == open_time(0, 600, here)
 
 def test_open_1000():
-	here = arrow.utcnow().isoformat()
-	there = here.shift(hours+=33)
-	there = there.shift(minutes+=5)
-	there == open_time(0, 600, here)
+	here = arrow.utcnow()
+	there = here.shift(hours=+33)
+	there = there.shift(minutes=+5)
+	assert there.isoformat() == open_time(1000, 1000, here)
 
 
 # Testing close_time
@@ -93,11 +97,12 @@ def test_close_1001():
 		pass
 
 def test_close_0():
-	here = arrow.utcnow().isoformat()
-	assert here == close_time(0, 600, here)
+	here = arrow.utcnow()
+	there = here.shift(hours=+1)
+	assert there.isoformat() == close_time(0, 600, here)
 
 def test_close_1000():
-	here = arrow.utcnow().isoformat()
-	there = here.shift(hours+=51)
-	there = there.shift(minutes+=0)
-	there == close_time(0, 600, here)
+	here = arrow.utcnow()
+	there = here.shift(hours=+75)
+	there = there.shift(minutes=+0)
+	assert there.isoformat() == close_time(1000, 1000, here)

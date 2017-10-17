@@ -65,7 +65,7 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
     if control_dist_km > brevet_dist_km: raise ValueError("Provided control distance is greater than provided Brevet distance")
     if control_dist_km < 0:              raise ValueError("Provided control distance is less than 0")
 
-    if control_dist_km == 0: time = 0
+    if control_dist_km == 0: time = 1
     else:                    time = find_time_using(MINSPD, control_dist_km)
     
     start = arrow.get(brevet_start_time)
@@ -73,7 +73,7 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
     shifted = start.shift(hours=+hrs)
     shifted = shifted.shift(minutes=+mins)
     #print("the open time is: "+str(hrs)+":"+str(mins))
-    return shifted
+    return shifted.isoformat()
 
 def find_time_using(spd, control_dist_km):
     """

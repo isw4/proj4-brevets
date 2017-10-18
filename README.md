@@ -1,5 +1,5 @@
 # Project 4:  Brevet time calculator with Ajax
-## Author: Isaac Hong Wong (iwong@uoregon.edu)
+### Author: Isaac Hong Wong (iwong@uoregon.edu)
 
 Reimplementing the RUSA ACP controle time calculator found at:
 https://rusa.org/octime_acp.html with one that works with AJAX and Flask.
@@ -39,27 +39,31 @@ The rules to determine the controle times are:
     distance, the maximum speed, and minimum speed specified for that distance.
     Riders must keep within a minimum and maximum speed for a specified distance.
 
-    First 200km: 15     to 34 km/h
-    Next  200km: 15     to 32 km/h
-    Next  200km: 15     to 30 km/h
-    Next  600km: 11.428 to 28 km/h
+    | Distances(km) | Minimum(km/h) | Maximum(km/h)
+    | ------------- | ------------- | --------
+    | First 200     | 15            | 34
+    | Next  200     | 15            | 32
+    | Next  200     | 15            | 30
+    | Next  600     | 11.428        | 28
 
+    ```
     For example, a controle at 700km has an opening time of:
-    
     200/34 + 200/32 + 200/30 + 100/28 = 22.37h (22h 22m) after the starting time
     
     And a closing time of:
-
     200/15 + 200/15 + 200/15 + 100/11.428 = 48.75h (48h 45m) after the starting time
+    ```
 
 3a) Brevets are organized only for 200, 300, 400, 600, and 1000km. However, the 
     last controle may not be at exactly those distances. The opening and closing
     time for the last controle is calculated using the brevet distance, not the
     actual distance.
 
+    ```
     For example, a brevet of 1000km may have a controle at 1050km, but the opening
     and closing times for this controle is as if it were at 1000km. No extra time 
     is given to cover the extra 50km.
+    ```
 
 3b) The final controle's distance must not be more than 110% of the brevet distance. 
 

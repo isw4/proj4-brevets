@@ -5,13 +5,15 @@ Test suite for the acp_times
 import acp_times, arrow
 from acp_times import convert_hrs_mins, find_time_using, open_time, close_time
 
-# Testing convert_hrs_mins
+### Testing convert_hrs_mins
+	# Boundary case
 def test_convert_00_00():
 	time = 0
 	hrs, mins = convert_hrs_mins(time)
 	assert int(hrs) == 0
 	assert int(mins) == 0
 
+	# Normal case
 def test_convert_05_20():
 	time = 5.45
 	hrs, mins = convert_hrs_mins(time)
@@ -19,90 +21,121 @@ def test_convert_05_20():
 	assert int(mins) == 27
 
 
-# Testing find_time_using(MAXSPD, distance)
-def test_find_time_max_100():
-	time = find_time_using(acp_times.MAXSPD, 100)
-	assert time - 2.93 < 0.02	#margin: +-1.2 minutes
-
-def test_find_time_max_300():
-	time = find_time_using(acp_times.MAXSPD, 300)
-	assert time - 9.00 < 0.02
-
-def test_find_time_max_500():
-	time = find_time_using(acp_times.MAXSPD, 500)
-	assert time - 15.47 < 0.02
-
-def test_find_time_max_900():
-	time = find_time_using(acp_times.MAXSPD, 900)
-	assert time - 29.52 < 0.02
-
-
-# Testing find_time_using(MINSPD, distance)
-def test_find_time_min_100():
-	time = find_time_using(acp_times.MINSPD, 100)
-	assert time - 6.67 < 0.02	#margin: +-1.2 minutes
-
-def test_find_time_min_300():
-	time = find_time_using(acp_times.MINSPD, 300)
-	assert time - 20.00 < 0.02
-
-def test_find_time_min_500():
-	time = find_time_using(acp_times.MINSPD, 500)
-	assert time - 33.33 < 0.02
-
-def test_find_time_min_900():
-	time = find_time_using(acp_times.MINSPD, 900)
-	assert time - 66.25 < 0.02
-
-
-# Testing open_time
-def test_open_neg():
-	try:
-		open_time(-1, 600, arrow.utcnow().isoformat())
+### Testing controle distance check
+	# Negative value
+def test_control_check_too_low():
+	try: 
+		check_control_distance(-1, 600)
 		assert False
 	except ValueError:
 		pass
 
-def test_open_1001():
-	try:
-		open_time(1001, 600, arrow.utcnow().isoformat())
+	# Value > 1.1*brevet_dist
+def test_control_check_too_high():
+	try: 
+		check_control_distance(661, 600)
 		assert False
 	except ValueError:
 		pass
 
-def test_open_0():
+### Testing find_time_using(MAXSPD, controle_dist, brevet_dist), normal and boundary cases
+def test_find_time_max_1():
+	time = find_time_using(acp_times.MAXSPD, 1, 1000)
+	assert time - 0.03 < 0.02	#margin: +-1.2 minutes for rounding errors
+
+def test_find_time_max_200():
+	time = find_time_using(acp_times.MAXSPD, 200, 1000)
+	assert time - 5.88 < 0.02
+
+def test_find_time_max_250():
+	time = find_time_using(acp_times.MAXSPD, 250, 1000)
+	assert time - 7.45 < 0.02
+
+def test_find_time_max_400():
+	time = find_time_using(acp_times.MAXSPD, 400 ,1000)
+	assert time - 12.13 < 0.02
+
+def test_find_time_max_450():
+	time = find_time_using(acp_times.MAXSPD, 450, 1000)
+	assert time - 13.80 < 0.02
+
+def test_find_time_max_600():
+	time = find_time_using(acp_times.MAXSPD, 600, 1000)
+	assert time - 18.80 < 0.02
+
+def test_find_time_max_650():
+	time = find_time_using(acp_times.MAXSPD, 650, 1000)
+	assert time - 20.58 < 0.02
+
+def test_find_time_max_1000():
+	time = find_time_using(acp_times.MAXSPD, 1000, 1000)
+	assert time - 33.08 < 0.02
+
+	# Special case: controle beyond the brevet time
+def test_find_time_max_1050():
+	time = find_time_using(acp_times.MAXSPD, 1050, 1000)
+	assert time - 33.08 < 0.02
+
+
+### Testing find_time_using(MINSPD, controle_dist, brevet_dist), normal and boundary cases
+def test_find_time_min_1():
+	time = find_time_using(acp_times.MINSPD, 1, 1000)
+	assert time - 0.07 < 0.02	#margin: +-1.2 minutes
+
+def test_find_time_min_200():
+	time = find_time_using(acp_times.MINSPD, 200, 1000)
+	assert time - 13.33 < 0.02
+
+def test_find_time_min_250():
+	time = find_time_using(acp_times.MINSPD, 250, 1000)
+	assert time - 16.67 < 0.02
+
+def test_find_time_min_400():
+	time = find_time_using(acp_times.MINSPD, 400 ,1000)
+	assert time - 26.67 < 0.02
+
+def test_find_time_min_450():
+	time = find_time_using(acp_times.MINSPD, 450, 1000)
+	assert time - 30.00 < 0.02
+
+def test_find_time_min_600():
+	time = find_time_using(acp_times.MINSPD, 600, 1000)
+	assert time - 40.00 < 0.02
+
+def test_find_time_min_650():
+	time = find_time_using(acp_times.MINSPD, 650, 1000)
+	assert time - 44.38 < 0.02
+
+def test_find_time_min_1000():
+	time = find_time_using(acp_times.MINSPD, 1000, 1000)
+	assert time - 75.00 < 0.02
+
+	# Special case: controle beyond the brevet time
+def test_find_time_min_1050():
+	time = find_time_using(acp_times.MINSPD, 1050, 1000)
+	assert time - 75.00 < 0.02
+
+
+### Testing shifting start time
+def shift_by_0():
+	here = arrow.utcnow()
+	assert here.isoformat() == shift_start_by(here.isoformat(), 0)
+
+def shift_by_some():
+	here = arrow.utcnow()
+	there = here.shift(hours=+1)
+	there = there.shift(minutes=+27)
+	assert there.isoformat() == shift_start_by(here.isoformat(), 1.45)
+
+
+### Testing open_time for special case of controle_dist = 0
+def test_open_0(): 
 	here = arrow.utcnow().isoformat()
 	assert here == open_time(0, 600, here)
 
-def test_open_1000():
-	here = arrow.utcnow()
-	there = here.shift(hours=+33)
-	there = there.shift(minutes=+5)
-	assert there.isoformat() == open_time(1000, 1000, here)
 
-
-# Testing close_time
-def test_close_neg():
-	try:
-		close_time(-1, 600, arrow.utcnow().isoformat())
-		assert False
-	except ValueError:
-		pass
-
-def test_close_1001():
-	try:
-		close_time(1001, 600, arrow.utcnow().isoformat())
-		assert False
-	except ValueError:
-		pass
-
-def test_close_0():
+# Testing close_time for special case of controle_dist = 0
+def test_close_0(): # Special case of starting point closing time
 	here = arrow.utcnow()
 	there = here.shift(hours=+1)
 	assert there.isoformat() == close_time(0, 600, here)
-
-def test_close_1000():
-	here = arrow.utcnow()
-	there = here.shift(hours=+75)
-	there = there.shift(minutes=+0)
-	assert there.isoformat() == close_time(1000, 1000, here)

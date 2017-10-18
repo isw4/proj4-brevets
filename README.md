@@ -59,11 +59,11 @@ The rules to determine the controle times are:
     time for the last controle is calculated using the brevet distance, not the
     actual distance.
 
-    ```
+    
     For example, a brevet of 1000km may have a controle at 1050km, but the opening
     and closing times for this controle is as if it were at 1000km. No extra time 
     is given to cover the extra 50km.
-    ```
+    
 
 3b) The final controle's distance must not be more than 110% of the brevet distance. 
 

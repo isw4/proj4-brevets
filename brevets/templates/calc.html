@@ -7,7 +7,7 @@
 
   <!-- Javascript:  JQuery from a content distribution network (CDN) -->
   <script
-     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+     src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
   <!-- Bootstrap includes javascript and css  (must follow jquery) -->
   <link rel="stylesheet"
@@ -15,11 +15,19 @@
   <script
     src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
+  <!-- Tablesaw: a library to create responsive tables -->
+  <link rel="stylesheet" 
+    href="static/css/tablesaw.stackonly.css">
+  <script 
+    src="{{ url_for('static', filename='js/stackonly/tablesaw.stackonly.jquery.js') }}"></script>
+  <script 
+    src="{{ url_for('static', filename='js/tablesaw-init.js') }}"></script>
+
   <!-- moment.js is the JavaScript equivalent of arrow.py -->
   <script 
-    src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+    src="{{ url_for('static', filename='js/moment/moment.min.js') }}"></script>
   <script 
-    src="{{ url_for('static', filename='js/moment-timezone-with-data.js') }}"></script>
+    src="{{ url_for('static', filename='js/moment/moment-timezone-with-data.js') }}"></script>
 
 </head>
 
@@ -29,76 +37,80 @@
 <body>
 <!-- bootstrap requires a 'container' div around content -->
 <div class="container">
-
-<h1>ACP Brevet Times</h1>
+<div class="row">
+  <h1>ACP Brevet Times</h1>
   <p>This worksheet is for ACP-sanctioned brevets between 200 and 1000 kilometers</p>
 
-<!-- Flash messages for exceptions and errors -->
-  <p id=flash></p>
+  <!-- Flash messages for exceptions and errors -->
+  <p id=flash class="alert alert-danger"></p>
+</div>
 
 <!-- Design on bootstrap grid -->
-<form role="form">
 <div class="row">
-  <div class="col-md-4">
+  <form role="form">
+  <div class="col-md-5">
     <label>Distance</label>
-  <select name="distance" id="brevet_dist_km">
-    <option value="200">200km</option>
-    <option value="300">300km</option>
-    <option value="400">400km</option>
-    <option value="600">600km</option>
-    <option value="1000">1000km</option>
-  </select>
+      <select name="distance" id="brevet_dist_km">
+        <option value="200">200km</option>
+        <option value="300">300km</option>
+        <option value="400">400km</option>
+        <option value="600">600km</option>
+        <option value="1000">1000km</option>
+      </select>
   </div> <!-- columns 1--4  -->
   <div class="col-md-6">
     <label>Begins at</label>
     <input type=date name="begin_date" id="begin_date" value="2017-01-01" />
     <input type=time name="begin_time" id="begin_time" value="00:00"    />
   </div> <!-- columns 5-10 -->
-  </div> <!-- row -->
+</div> <!-- row -->
 
   <br />  <!-- Cosmetic -- a little vertical space -->
   <!-- Although we do not use tables for general page layout, they are
        appropriate for something that really is a table, like this
        one.  We allocate it the full 12 columns of the bootstrap grid.
   -->
+
+  <!-- Table built using tablesaw -->
   <div class="row">
-  <div class="col-md-12"> 
-  <table class="control_time_table">
-      <tr>
-	<th> Miles </th>
-	<th> Km </th>
-	<th>Location</th>
-	<th>Open</th>
-	<th>Close</th>
-	<th>Notes</th>
-      </tr>
-   {% for row in range(20) %}
-    <tr class="control">
-      <!-- Dist (mi) -->
-      <td><input name="miles" type="number" 
-           min="0" max="900" size="5" /></td>
-      <!-- Dist (km) -->
-      <td><input name="km" type="number"
-	   min="0" max="1100" size="5" /> </td>
-      <!-- Location (optional) -->
-      <td><input name="location" type="text" 
-        placeholder="Optional location name"
-	size="20" /> </td>
-      <!-- Open time (read only, set by JavaScript function -->
-      <td><input name="open" type="datetime" value="" readonly /></td>
-      <!-- Close time (read only, set by JavaScript function -->
-      <td><input name="close" type="datetime" value="" readonly /></td>
-      <!-- Notes (error messages for this row) -->
-      <td class="notes"> &nbsp; </td>
-    </tr>
-    {% endfor %}
-  </table>
-  </div> <!-- col -->
-  </div> <!-- row -->
-</form>
+    <div class="col-md-12">
+      <table class="tablesaw tablesaw-stack" data-tablesaw-mode="stack">
+        <thead>
+          <tr>
+            <th>Miles   </th>
+            <th>Km      </th>
+            <th>Location</th>
+            <th>Open    </th>
+            <th>Close   </th>
+            <th>Notes   </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in range(20) %}
+          <tr class="control">
+            <!-- Dist (mi) -->
+            <td><input name="miles"    type="number" min="0" max="900"  size="5" /></td>
+            <!-- Dist (km) -->
+            <td><input name="km"       type="number" min="0" max="1100" size="5" /></td>
+            <!-- Location (optional) -->
+            <td><input name="location" type="text" placeholder="Optional location name" size="20" /></td>
+            <!-- Open time (read only, set by JavaScript function -->
+            <td><input name="open"     type="datetime" value="" readonly /></td>
+            <!-- Close time (read only, set by JavaScript function -->
+            <td><input name="close"    type="datetime" value="" readonly /></td>
+            <!-- Notes (error messages for this row) -->
+            <td class="notes"> &nbsp; </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+</div>
+
 
 <meta id="script-root" name="script-root" data-scriptroot="{{ request.script_root|tojson|safe }}" data-other="other">
-<script type="text/javascript" src="{{ url_for('static', filename="js/calc.js") }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/calc.js') }}"></script>
 
 </div>
 </body> </html>

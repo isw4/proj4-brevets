@@ -10,7 +10,9 @@ var TIME_CALC_URL = SCRIPT_ROOT + "/_calc_times";
 function calc_times(control) {
   var km = control.find("input[name='km']").val();
   var brev_dist  = $("#brevet_dist_km").val();
-  var timezone   = moment.tz.guess();      // As a string. See moment.tz docs
+
+  //Get start time based on user time zone
+  var timezone   = moment.tz.guess();      // Guess user time zone as a string. See moment.tz docs
   var begin_date = $("#begin_date").val(); // In YYYY/MM/DD
   var begin_time = $("#begin_time").val(); // In HH:mm
   var start_time = moment.tz(begin_date + " " + begin_time, timezone).format()
@@ -24,7 +26,7 @@ function calc_times(control) {
     function(data) {
       if (data.result.exception) {
         error_string = data.result.exception;
-        $("#flash").text(error_string);
+        flash(error_string);
         console.log("Exception from server: " + error_string);
       }
       else {
@@ -40,20 +42,43 @@ function calc_times(control) {
 }
 
 function first_controle_not_zero() {
-  return !(   parseFloat($("tr.control td:nth-of-type(1)>input").val()) === 0
-           || parseFloat($("tr.control td:nth-of-type(2)>input").val()) === 0);
+  // Checking for the special case of when the first controle entry is not 0.
+  // The check must occur after the distance is converted from miles to km or
+  // vice versa.
+  // Returns: true if either value is not zero
+  if (   parseFloat($("tr.control td:nth-of-type(1) input").val()) !== 0
+      || parseFloat($("tr.control td:nth-of-type(2) input").val()) !== 0) {
+    flash("First controle distance must be 0");
+    return true;
+  }
+  else return false;
+}
+
+function clear_relevant_fields(control_entry) {
+  // Clearing any past flash messages and old values in the relevant entry fields
+  remove_flash();
+  control_entry.find("input[name='open']").val("");
+  control_entry.find("input[name='close']").val("");
+}
+
+function flash(message) {
+  $('#flash').text(message);
+  $("#flash").fadeIn();
+}
+
+function remove_flash() {
+  $('#flash').text("");
+  $("#flash").fadeOut();
 }
 
 $(document).ready(function(){
 // Do the following when the page is finished loading
 
   $('input[name="miles"]').change(function() {
-    var control_entry = $(this).parents(".control")
+    var control_entry = $(this).parents(".control");
 
-    //clearing all old flash messages
-    $('#flash').text("");
-    control_entry.find("input[name='open']").val("");
-    control_entry.find("input[name='close']").val("");
+    //clearing all old flash messages and any open/close fields in this entry
+    clear_relevant_fields(control_entry)
 
     // If the input is in miles, converts to km first
     var miles = parseFloat($(this).val());
@@ -62,21 +87,17 @@ $(document).ready(function(){
     var target = control_entry.find("input[name='km']");
     target.val( km );
 
-    
-
-    if (first_controle_not_zero()) return $("#flash").text("First controle distance must be 0");
+    if (first_controle_not_zero()) return 
 
     // Then calculate times for this entry
     calc_times(control_entry);
   });
 
   $('input[name="km"]').change(function() {
-    var control_entry = $(this).parents(".control")
+    var control_entry = $(this).parents(".control");
 
-    //clearing all old flash messages
-    $('#flash').text("");
-    control_entry.find("input[name='open']").val("");
-    control_entry.find("input[name='close']").val("");
+    //clearing all old flash messages and any open/close fields in this entry
+    clear_relevant_fields(control_entry)
 
     // If the input is in km, convert to miles first
     var km = parseFloat($(this).val());
@@ -85,9 +106,7 @@ $(document).ready(function(){
     var target = control_entry.find("input[name='miles']");
     target.val( miles );
 
-    
-
-    if (first_controle_not_zero()) return $("#flash").text("First controle distance must be 0");
+    if (first_controle_not_zero()) return
 
     // Then calculate times for this entry
     calc_times(control_entry);

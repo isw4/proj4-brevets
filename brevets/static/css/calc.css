@@ -6,3 +6,14 @@
  * add more specific styles. 
  */
 
+#flash {
+	display: none;
+}
+
+form {
+	margin-top: 10px;
+}
+
+input {
+	width: 100%;
+}

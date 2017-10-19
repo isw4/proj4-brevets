@@ -134,8 +134,31 @@ def test_open_0():
 	assert here == open_time(0, 600, here)
 
 
-# Testing close_time for special case of controle_dist = 0
-def test_close_0(): # Special case of starting point closing time
+# Testing close_time for special case of controle_dist = 0 and
+# brevet ending times
+def test_close_0():
 	here = arrow.utcnow()
 	there = here.shift(hours=+1)
 	assert there.isoformat() == close_time(0, 600, here)
+
+def test_close_200():
+	here = arrow.utcnow()
+	there = here.shift(hours=+13)
+	there = there.shift(minutes=+30)
+	assert there.isoformat() == close_time(200, 200, here)
+
+def test_close_210():
+	here = arrow.utcnow()
+	there = here.shift(hours=+13)
+	there = there.shift(minutes=+30)
+	assert there.isoformat() == close_time(210, 200, here)
+
+def test_close_1000():
+	here = arrow.utcnow()
+	there = here.shift(hours=+75)
+	assert there.isoformat() == close_time(1000, 1000, here)
+
+def test_close_1050():
+	here = arrow.utcnow()
+	there = here.shift(hours=+75)
+	assert there.isoformat() == close_time(1050, 1000, here)

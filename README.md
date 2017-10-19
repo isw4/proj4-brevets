@@ -35,9 +35,10 @@ The rules to determine the controle times are:
 1)  The closing time at the starting point(first controle) is always 1h after 
     the race begins
 
-2)  The opening and closing time for subsequent controles depends on the
-    distance, the maximum speed, and minimum speed specified for that distance.
-    Riders must keep within a minimum and maximum speed for a specified distance.
+2)  The opening and closing time for subsequent controles(except the last controle)
+    depends on the distance, the maximum speed, and minimum speed specified for that
+    distance. Riders must keep within a minimum and maximum speed for a specified 
+    distance.
 
     | Distances(km) | Minimum(km/h) | Maximum(km/h)
     | ------------- | ------------- | --------
@@ -47,7 +48,8 @@ The rules to determine the controle times are:
     | Next  600     | 11.428        | 28
 
     ```
-    For example, a controle at 700km has an opening time of:
+    For example, suppose a brevet of 1000km has a controle at 700km. 
+    This controle has an opening time of:
     200/34 + 200/32 + 200/30 + 100/28 = 22.37h (22h 22m) after the starting time
     
     And a closing time of:
@@ -55,14 +57,22 @@ The rules to determine the controle times are:
     ```
 
 3a) Brevets are organized only for 200, 300, 400, 600, and 1000km. However, the 
-    last controle may not be at exactly those distances. The opening and closing
-    time for the last controle is calculated using the brevet distance, not the
-    actual distance.
+    last controle may not be at exactly those distances. Furthermore, the closing
+    time is fixed, not calculated using the rule above.
 
-    
+    | Brevet distance(km) | Final controle closing time(hh:mm after start)
+    | ------------------- | ------------------------------------------
+    | 200                 | 13:30
+    | 300                 | 20:00
+    | 400                 | 27:00
+    | 600                 | 40:00
+    | 1000                | 75:00
+
+    ```
     For example, a brevet of 1000km may have a controle at 1050km, but the opening
     and closing times for this controle is as if it were at 1000km. No extra time 
     is given to cover the extra 50km.
+    ```
     
 
 3b) The final controle's distance must not be more than 110% of the brevet distance. 

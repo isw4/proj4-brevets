@@ -18,7 +18,7 @@ import arrow, math
 CUTOFF =  [0, 200, 400, 600, 1000]   #cutoff distance brackets for each speed bracket (km)
 MAXSPD =  [0, 34 , 32 , 30 , 28]     #maximum speed for each time bracket (km/h)
 MINSPD =  [0, 15 , 15 , 15 , 11.428] #minimum speed for eachg time bracket (km/h)
-
+FIXED_CLOSE = {0:1, 200:13.5, 300:20, 400:27, 600:40, 1000:75}
 
 def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
 	"""
@@ -33,12 +33,11 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
 		 An ISO 8601 format date string indicating the control open time.
 		 This will be in the same time zone as the brevet start time.
 	"""
-	assert brevet_dist_km >= 0 and brevet_dist_km <= 1000
+	assert brevet_dist_km in FIXED_CLOSE
 	try:   check_control_distance(control_dist_km, brevet_dist_km)
 	except ValueError: raise
 
-	if control_dist_km == 0: time = 0
-	else:                    time = find_time_using(MAXSPD, control_dist_km, brevet_dist_km)
+	time = find_time_using(MAXSPD, control_dist_km, brevet_dist_km)
 	
 	return shift_start_by(brevet_start_time, time)
 
@@ -56,12 +55,15 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
 		 An ISO 8601 format date string indicating the control close time.
 		 This will be in the same time zone as the brevet start time.
 	"""
-	assert brevet_dist_km >= 0 and brevet_dist_km <= 1000
+	assert brevet_dist_km in FIXED_CLOSE
 	try:   check_control_distance(control_dist_km, brevet_dist_km)
 	except ValueError: raise
 
-	if control_dist_km == 0: time = 1 # Special case of the closing time at the start point always being 1h
-	else:                    time = find_time_using(MINSPD, control_dist_km, brevet_dist_km)
+	if control_dist_km >= brevet_dist_km:
+		# Special case of a fixed closing time at the last controle
+		time = FIXED_CLOSE[brevet_dist_km]
+	else:
+		time = find_time_using(MINSPD, control_dist_km, brevet_dist_km)
 	
 	return shift_start_by(brevet_start_time, time)
 
@@ -70,8 +72,12 @@ def find_time_using(spd, control_dist_km, brevet_dist_km):
 	Calculates the time to travel the control distance given by the speeds in the spd variable. It iterates
 	through the distance cutoff array, then increments the time appropriately if control > CUTOFF[i]. Once the 
 	control distance is within its appropriate bracket, the time is incremented from the remaining distance.
-	Also handles the special case of where the controle distance is greater than the brevet ending distance,
-	though it does not check whether the controle distance is too far beyond the brevet ending distance.
+	Supported:
+		Open/Close times for the case of when the controle distance is less than or equal to the brevet distance.
+		Open/----- times for the case of when the controle distance is greater than the brevet distance.
+	Unsupported:
+		----/Close times for the case of when the controle distance is greater than the brevet distance.
+
 	Args:
 		spd: list of numbers, of appropriate speeds (should either be the constant arrays MAXSPD or MINSPD)
 		control_dist_km: number, the control distance in kilometers
@@ -82,7 +88,7 @@ def find_time_using(spd, control_dist_km, brevet_dist_km):
 	rem = control_dist_km
 	for i in range(1, len(CUTOFF)):
 		if control_dist_km > CUTOFF[i] and brevet_dist_km == CUTOFF[i]:
-			# For the special case when the controle is > the brevet end distance
+			# For the case when the controle is > the brevet end distance
 			time += (CUTOFF[i] - CUTOFF[i-1])/spd[i]
 			break
 		elif control_dist_km > CUTOFF[i]:
@@ -91,7 +97,7 @@ def find_time_using(spd, control_dist_km, brevet_dist_km):
 			time += delta/spd[i]
 			rem -= delta
 		else:
-			# For the normal case when the controle is < the brevet end distance 
+			# For the case when the controle is < the brevet end distance 
 			time += rem/spd[i]
 			break
 	return time

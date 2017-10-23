@@ -3,7 +3,7 @@ Test suite for the acp_times
 """
 
 import acp_times, arrow
-from acp_times import convert_hrs_mins, find_time_using, open_time, close_time
+from acp_times import check_control_distance, convert_hrs_mins, find_time_using, open_time, close_time
 
 ### Testing convert_hrs_mins
 	# Boundary case
@@ -139,6 +139,8 @@ def test_open_0():
 def test_close_0():
 	here = arrow.utcnow()
 	there = here.shift(hours=+1)
+	print(here.isoformat())
+	print(close_time(0, 600, here))
 	assert there.isoformat() == close_time(0, 600, here)
 
 def test_close_200():

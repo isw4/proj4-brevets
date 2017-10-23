@@ -59,7 +59,9 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
 	try:   check_control_distance(control_dist_km, brevet_dist_km)
 	except ValueError: raise
 
-	if control_dist_km >= brevet_dist_km:
+        if control_dist_km == 0:
+                time = FIXED_CLOSE[control_dist_km]
+	elif control_dist_km >= brevet_dist_km:
 		# Special case of a fixed closing time at the last controle
 		time = FIXED_CLOSE[brevet_dist_km]
 	else:
